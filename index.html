@@ -345,7 +345,6 @@
 <script>
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-  // DOM элементы
   const mainPage = document.getElementById('mainPage');
   const registrationModal = document.getElementById('registrationModal');
   const mainRegisterBtn = document.getElementById('mainRegisterBtn');
@@ -357,7 +356,6 @@
   const email = document.getElementById('email');
   const phone = document.getElementById('phone');
 
-  // Валидация
   function isValidEmail(e) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
   }
@@ -413,22 +411,47 @@
     };
   }
 
-  // Открыть модаль
+  function autofillTelegramData() {
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      const user = tg.initDataUnsafe.user;
+      
+      if (user.first_name) {
+        firstName.value = user.first_name;
+      }
+      
+      if (user.last_name) {
+        lastName.value = user.last_name;
+      }
+    }
+  }
+
   mainRegisterBtn.addEventListener('click', () => {
     mainPage.style.display = 'none';
     registrationModal.classList.add('show');
-    firstName.focus();
+    
+    autofillTelegramData(); 
+
+    if (!firstName.value) {
+      firstName.focus();
+    } else if (!lastName.value) {
+      lastName.focus();
+    } else if (!email.value) {
+      email.focus();
+    } else {
+       email.focus();
+    }
+
 
     if (tg) {
       tg.MainButton.hide();
     }
   });
 
-  // Закрыть модаль
   closeModalBtn.addEventListener('click', () => {
     registrationModal.classList.remove('show');
     mainPage.style.display = 'flex';
     clearErrors();
+    
     firstName.value = '';
     lastName.value = '';
     email.value = '';
@@ -439,7 +462,6 @@
     }
   });
 
-  // Отправить
   submitBtn.addEventListener('click', () => {
     if (!validate()) return;
 
@@ -453,12 +475,13 @@
     }
   });
 
-  // Инициализация Telegram
   if (tg) {
     try { tg.expand(); } catch (e) {}
   }
-
-  firstName.focus();
+  
+  if (!firstName.value) {
+    firstName.focus();
+  }
 </script>
 </body>
 </html>
