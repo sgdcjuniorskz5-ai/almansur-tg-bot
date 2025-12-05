@@ -343,145 +343,171 @@
 </div>
 
 <script>
-  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+  // Инициализация объекта Telegram WebApp. Если WebApp не запущен, tg будет null.
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-  const mainPage = document.getElementById('mainPage');
-  const registrationModal = document.getElementById('registrationModal');
-  const mainRegisterBtn = document.getElementById('mainRegisterBtn');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const submitBtn = document.getElementById('submitBtn');
+  // 1. DOM Элементы
+  const mainPage = document.getElementById('mainPage');
+  const registrationModal = document.getElementById('registrationModal');
+  const mainRegisterBtn = document.getElementById('mainRegisterBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const submitBtn = document.getElementById('submitBtn');
 
-  const firstName = document.getElementById('firstName');
-  const lastName = document.getElementById('lastName');
-  const email = document.getElementById('email');
-  const phone = document.getElementById('phone');
+  const firstName = document.getElementById('firstName');
+  const lastName = document.getElementById('lastName');
+  const email = document.getElementById('email');
+  const phone = document.getElementById('phone');
 
-  function isValidEmail(e) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-  }
+  // 2. Функции Валидации
+  function isValidEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  }
 
-  function isValidPhone(p) {
-    return /\+?\d{7,15}/.test(p.replace(/\s|[-()]/g, ""));
-  }
+  function isValidPhone(p) {
+    // Простая проверка на наличие от 7 до 15 цифр, опционально с плюсом
+    return /\+?\d{7,15}/.test(p.replace(/\s|[-()]/g, ""));
+  }
 
-  function clearErrors() {
-    document.getElementById('errorFirstName').classList.remove('show');
-    document.getElementById('errorLastName').classList.remove('show');
-    document.getElementById('errorEmail').classList.remove('show');
-    document.getElementById('errorPhone').classList.remove('show');
-  }
+  function clearErrors() {
+    document.getElementById('errorFirstName').classList.remove('show');
+    document.getElementById('errorLastName').classList.remove('show');
+    document.getElementById('errorEmail').classList.remove('show');
+    document.getElementById('errorPhone').classList.remove('show');
+  }
 
-  function validate() {
-    clearErrors();
-    let isValid = true;
+  function validate() {
+    clearErrors();
+    let isValid = true;
 
-    if (!firstName.value.trim()) {
-      document.getElementById('errorFirstName').textContent = "Укажите имя";
-      document.getElementById('errorFirstName').classList.add('show');
-      isValid = false;
-    }
+    if (!firstName.value.trim()) {
+      document.getElementById('errorFirstName').textContent = "Укажите имя";
+      document.getElementById('errorFirstName').classList.add('show');
+      isValid = false;
+    }
 
-    if (!lastName.value.trim()) {
-      document.getElementById('errorLastName').textContent = "Укажите фамилию";
-      document.getElementById('errorLastName').classList.add('show');
-      isValid = false;
-    }
+    if (!lastName.value.trim()) {
+      document.getElementById('errorLastName').textContent = "Укажите фамилию";
+      document.getElementById('errorLastName').classList.add('show');
+      isValid = false;
+    }
 
-    if (!isValidEmail(email.value.trim())) {
-      document.getElementById('errorEmail').textContent = "Некорректный e‑mail";
-      document.getElementById('errorEmail').classList.add('show');
-      isValid = false;
-    }
+    if (!isValidEmail(email.value.trim())) {
+      document.getElementById('errorEmail').textContent = "Некорректный e‑mail";
+      document.getElementById('errorEmail').classList.add('show');
+      isValid = false;
+    }
 
-    if (!isValidPhone(phone.value.trim())) {
-      document.getElementById('errorPhone').textContent = "Некорректный телефон";
-      document.getElementById('errorPhone').classList.add('show');
-      isValid = false;
-    }
+    if (!isValidPhone(phone.value.trim())) {
+      document.getElementById('errorPhone').textContent = "Некорректный телефон";
+      document.getElementById('errorPhone').classList.add('show');
+      isValid = false;
+    }
 
-    return isValid;
-  }
+    return isValid;
+  }
 
-  function gatherData() {
-    return {
-      firstName: firstName.value.trim(),
-      lastName: lastName.value.trim(),
-      email: email.value.trim(),
-      phone: phone.value.trim()
-    };
-  }
+  function gatherData() {
+    return {
+      firstName: firstName.value.trim(),
+      lastName: lastName.value.trim(),
+      email: email.value.trim(),
+      phone: phone.value.trim()
+    };
+  }
 
-  function autofillTelegramData() {
-    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      const user = tg.initDataUnsafe.user;
-      
-      if (user.first_name) {
-        firstName.value = user.first_name;
-      }
-      
-      if (user.last_name) {
-        lastName.value = user.last_name;
-      }
-    }
-  }
+  // 3. Функция автозаполнения с отладкой
+  function autofillTelegramData() {
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      const user = tg.initDataUnsafe.user;
+      console.log("Telegram User Data Received:", user); // 👈 ОТЛАДКА: Проверяем, что получили данные
+      
+      // Заполняем Имя
+      if (user.first_name) {
+        firstName.value = user.first_name;
+        console.log("Имя заполнено:", user.first_name);
+      } else {
+        console.log("Имя (first_name) отсутствует.");
+      }
+      
+      // Заполняем Фамилию
+      if (user.last_name) {
+        lastName.value = user.last_name;
+        console.log("Фамилия заполнена:", user.last_name);
+      } else {
+        console.log("Фамилия (last_name) отсутствует.");
+      }
+    } else if (tg) {
+      console.log("WebApp работает, но данные initDataUnsafe.user не переданы. Проверьте настройки конфиденциальности.");
+    } else {
+      console.log("Не запущено как Telegram Web App.");
+    }
+  }
 
-  mainRegisterBtn.addEventListener('click', () => {
-    mainPage.style.display = 'none';
-    registrationModal.classList.add('show');
-    
-    autofillTelegramData(); 
+  // 4. Обработчик открытия модального окна (Присоединиться)
+  mainRegisterBtn.addEventListener('click', () => {
+    mainPage.style.display = 'none';
+    registrationModal.classList.add('show');
+    
+    // Очищаем поля, чтобы начать с чистого листа
+    firstName.value = '';
+    lastName.value = '';
+    email.value = '';
+    phone.value = '';
+    
+    // !!! ГЛАВНЫЙ ШАГ: Автозаполнение данных из Telegram !!!
+    autofillTelegramData(); 
 
-    if (!firstName.value) {
-      firstName.focus();
-    } else if (!lastName.value) {
-      lastName.focus();
-    } else if (!email.value) {
-      email.focus();
-    } else {
-       email.focus();
-    }
+    // Устанавливаем фокус на первое незаполненное поле
+    if (!firstName.value) {
+      firstName.focus();
+    } else if (!lastName.value) {
+      lastName.focus();
+    } else {
+      email.focus();
+    }
 
+    if (tg) {
+      tg.MainButton.hide(); // Скрываем основную кнопку Telegram, пока открыта форма
+    }
+  });
 
-    if (tg) {
-      tg.MainButton.hide();
-    }
-  });
+  // 5. Обработчик закрытия модального окна
+  closeModalBtn.addEventListener('click', () => {
+    registrationModal.classList.remove('show');
+    mainPage.style.display = 'flex';
+    clearErrors();
+    
+    // Очищаем поля
+    firstName.value = '';
+    lastName.value = '';
+    email.value = '';
+    phone.value = '';
 
-  closeModalBtn.addEventListener('click', () => {
-    registrationModal.classList.remove('show');
-    mainPage.style.display = 'flex';
-    clearErrors();
-    
-    firstName.value = '';
-    lastName.value = '';
-    email.value = '';
-    phone.value = '';
+    if (tg) {
+      tg.MainButton.hide();
+    }
+  });
 
-    if (tg) {
-      tg.MainButton.hide();
-    }
-  });
+  // 6. Обработчик отправки формы
+  submitBtn.addEventListener('click', () => {
+    if (!validate()) return; // Проверка валидации
 
-  submitBtn.addEventListener('click', () => {
-    if (!validate()) return;
+    const payload = gatherData(); // Сбор данных
 
-    const payload = gatherData();
+    if (tg) {
+      // Отправка данных обратно боту и закрытие Web App
+      tg.sendData(JSON.stringify(payload));
+      try { tg.close(); } catch(e) {}
+    } else {
+      // Для отладки в браузере
+      alert("Данные:\n" + JSON.stringify(payload, null, 2));
+    }
+  });
 
-    if (tg) {
-      tg.sendData(JSON.stringify(payload));
-      try { tg.close(); } catch(e) {}
-    } else {
-      alert("Данные:\n" + JSON.stringify(payload, null, 2));
-    }
-  });
-
-  if (tg) {
-    try { tg.expand(); } catch (e) {}
-  }
-  
-  if (!firstName.value) {
-    firstName.focus();
-  }
+  // 7. Инициализация при запуске
+  if (tg) {
+    try { tg.expand(); } catch (e) {} // Растягиваем Web App на полный экран
+  }
 </script>
 </body>
 </html>
