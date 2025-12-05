@@ -343,7 +343,6 @@
 </div>
 
 <script>
-  // Инициализация объекта Telegram WebApp. Если WebApp не запущен, tg будет null.
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
   // 1. DOM Элементы
@@ -358,13 +357,12 @@
   const email = document.getElementById('email');
   const phone = document.getElementById('phone');
 
-  // 2. Функции Валидации
+  // 2. Функции Валидации (без изменений)
   function isValidEmail(e) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
   }
 
   function isValidPhone(p) {
-    // Простая проверка на наличие от 7 до 15 цифр, опционально с плюсом
     return /\+?\d{7,15}/.test(p.replace(/\s|[-()]/g, ""));
   }
 
@@ -415,31 +413,26 @@
     };
   }
 
-  // 3. Функция автозаполнения с отладкой
+  // 3. Функция автозаполнения с АВАРИЙНОЙ ОТЛАДКОЙ
   function autofillTelegramData() {
     if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
       const user = tg.initDataUnsafe.user;
-      console.log("Telegram User Data Received:", user); // 👈 ОТЛАДКА: Проверяем, что получили данные
+     
+      // !!! АВАРИЙНАЯ ОТЛАДКА !!!
+      alert('Получены данные: Имя=' + (user.first_name || 'НЕТ') + ', Фамилия=' + (user.last_name || 'НЕТ'));
       
       // Заполняем Имя
       if (user.first_name) {
         firstName.value = user.first_name;
-        console.log("Имя заполнено:", user.first_name);
-      } else {
-        console.log("Имя (first_name) отсутствует.");
       }
       
       // Заполняем Фамилию
       if (user.last_name) {
         lastName.value = user.last_name;
-        console.log("Фамилия заполнена:", user.last_name);
-      } else {
-        console.log("Фамилия (last_name) отсутствует.");
       }
     } else if (tg) {
-      console.log("WebApp работает, но данные initDataUnsafe.user не переданы. Проверьте настройки конфиденциальности.");
-    } else {
-      console.log("Не запущено как Telegram Web App.");
+      // !!! АВАРИЙНАЯ ОТЛАДКА !!!
+      alert('WebApp запущен, но данные пользователя (user data) НЕ переданы. Проверьте настройки конфиденциальности.');
     }
   }
 
@@ -448,7 +441,6 @@
     mainPage.style.display = 'none';
     registrationModal.classList.add('show');
     
-    // Очищаем поля, чтобы начать с чистого листа
     firstName.value = '';
     lastName.value = '';
     email.value = '';
@@ -457,7 +449,7 @@
     // !!! ГЛАВНЫЙ ШАГ: Автозаполнение данных из Telegram !!!
     autofillTelegramData(); 
 
-    // Устанавливаем фокус на первое незаполненное поле
+    // Устанавливаем фокус
     if (!firstName.value) {
       firstName.focus();
     } else if (!lastName.value) {
@@ -467,17 +459,16 @@
     }
 
     if (tg) {
-      tg.MainButton.hide(); // Скрываем основную кнопку Telegram, пока открыта форма
+      tg.MainButton.hide();
     }
   });
 
-  // 5. Обработчик закрытия модального окна
+  // 5. Обработчик закрытия модального окна (без изменений)
   closeModalBtn.addEventListener('click', () => {
     registrationModal.classList.remove('show');
     mainPage.style.display = 'flex';
     clearErrors();
     
-    // Очищаем поля
     firstName.value = '';
     lastName.value = '';
     email.value = '';
@@ -488,25 +479,23 @@
     }
   });
 
-  // 6. Обработчик отправки формы
+  // 6. Обработчик отправки формы (без изменений)
   submitBtn.addEventListener('click', () => {
-    if (!validate()) return; // Проверка валидации
+    if (!validate()) return;
 
-    const payload = gatherData(); // Сбор данных
+    const payload = gatherData();
 
     if (tg) {
-      // Отправка данных обратно боту и закрытие Web App
       tg.sendData(JSON.stringify(payload));
       try { tg.close(); } catch(e) {}
     } else {
-      // Для отладки в браузере
       alert("Данные:\n" + JSON.stringify(payload, null, 2));
     }
   });
 
-  // 7. Инициализация при запуске
+  // 7. Инициализация при запуске (без изменений)
   if (tg) {
-    try { tg.expand(); } catch (e) {} // Растягиваем Web App на полный экран
+    try { tg.expand(); } catch (e) {}
   }
 </script>
 </body>
