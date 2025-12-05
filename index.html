@@ -413,21 +413,17 @@
 
   function autofillTelegramData() {
     if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        const user = tg.initDataUnsafe.user;
+      const user = tg.initDataUnsafe.user;
       
-        console.log("Данные пользователя из Telegram:", user);
-        
-        if (user.first_name) {
-            firstName.value = user.first_name;
-        }
-        
-        if (user.last_name) {
-            lastName.value = user.last_name;
-        }
-    } else if (tg) {
-        console.log("Объект WebApp существует, но нет данных пользователя (initDataUnsafe.user).");
-    } else {
-        co
+      if (user.first_name) {
+        firstName.value = user.first_name;
+      }
+      
+      if (user.last_name) {
+        lastName.value = user.last_name;
+      }
+    }
+  }
 
   mainRegisterBtn.addEventListener('click', () => {
     mainPage.style.display = 'none';
